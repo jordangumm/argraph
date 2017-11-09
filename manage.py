@@ -1,28 +1,50 @@
 import click
+import configparser
 
 from argraph.models import RefSequence, Reference
 
 from neomodel import db, clear_neo4j_database
 from neomodel import config
 
+from urllib.parse import urlparse
+
+
+def get_config():
+    cfg = configparser.ConfigParser()
+    cfg.read('config.ini')
+
+    if config['neo4j']['ARG_DATABASE_PATH'] == 'None':
+        while True:
+            user_input = raw_input('ARG_DATABASE_PATH.  Set now?: [Y/n]')
+            if 'n' in user_input or 'N' in user_input:
+                break
+            elif 'y' in user_input or 'Y' in user_input:
+                user_input = raw_input('ARG_DATABASE_PATH')
+
+    return cfg
 
 
 @click.group()
 @click.pass_context
 def cli(ctx):
-    pass
+    cfg = configparser.ConfigParser()
+    cfg.read('config.ini')
+    config.DATABASE_URL = cfg['neo4j']['DATABASE_URL']
+    db.set_connection(config.DATABASE_URL)
 
 
 @cli.command()
 def build_database():
     """ IN DEVELOPMENT: builds base neo4j ARG database """
+    #user_input = raw_input('[WARNING] ')
+    click.echo('Clearing database')
+    clear_neo4j_database(db)
     click.echo('Building database')
-    config.DATABASE_URL = 'bolt://neo4j:neo4j@localhost:7687'
-    #clear_neo4j_database(db)
-    #db.set_connection('bolt://neo4j:neo4j@localhost:7687')
     RefSequence(sequence='ACGT', antibiotic_molecule='None').save()
+    RefSequence(sequence='ACGTCT', antibiotic_molecule='None').save()
     Reference(name='CARD2017').save()
-    print(RefSequence.nodes.get())
+    for refseq in RefSequence.nodes.filter():
+        print(refseq)
 
 
 @cli.command()
