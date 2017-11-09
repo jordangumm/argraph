@@ -6,13 +6,13 @@ from neomodel import (DateProperty, UniqueIdProperty, RelationshipTo, Relationsh
 class RefSequence(StructuredNode):
     """ Sequence found in ARG reference database w/ attributes
     """
-    sequence = StringProperty(unique_index=True, required=True)
+    sequence = StringProperty()
     antibiotic_molecule = StringProperty() # molecule resistant to
     #reference = RelationshipFrom('Reference', 'Found_In')
 
 
 class Reference(StructuredNode):
-    name = StringProperty(unique_index=True)
+    name = StringProperty()
     release = DateProperty()
 
 
@@ -22,10 +22,6 @@ class Reference(StructuredNode):
 #    refseq = RelationshipTo('RefSequence', 'REFSEQ')
     #study = RelationshipFrom('Study', 'IS_FROM')
     #sample = RelationshipFrom('Sample', 'IS_FROM')
-
-
-#class Study(StructuredNode):
-#    name = StringProperty(unique_index=True, required=True)
 
 
 #class Sample(StructuredNode):
