@@ -46,13 +46,12 @@ def print_multirelational_args():
     refs = [x for x in refs]
     seqs = RefSequence.nodes.filter() # print any sequence for testing
     for seq in seqs:
-        in_all = True
+        num_relations = 0
         for ref in refs:
-            if not seq.reference.relationship(ref):
-                in_all = False
-                break
-        if in_all:
-            print(seq)
+            if seq.reference.relationship(ref):
+                num_relations += 1
+        if num_relations > 1:
+            print('{}: {}'.format(seq.id, num_relations))
 
 @cli.command()
 def clear_database():
