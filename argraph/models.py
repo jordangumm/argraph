@@ -6,9 +6,12 @@ from neomodel import (DateProperty, UniqueIdProperty, RelationshipTo, Relationsh
 class RefSequence(StructuredNode):
     """ Sequence found in ARG reference database w/ attributes
     """
-    sequence = StringProperty()
+    sequence = StringProperty(required=True) # encoded to 4x shorter length
+    sequence_length = IntegerProperty() # unencoded sequence length, for use by encode/decode algorithm
+    card_accession = StringProperty() # antibiotic resistance ontology identifier
+    genbank_accession = StringProperty()
     antibiotic_molecule = StringProperty() # molecule resistant to
-    #reference = RelationshipFrom('Reference', 'Found_In')
+    reference = RelationshipTo('Reference', 'Found_In')
 
 
 class Reference(StructuredNode):
