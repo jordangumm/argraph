@@ -15,8 +15,7 @@ def get_relationship(aro, relation):
     if 'relationship' in node:
         for rel in node['relationship']:
             if relation in rel:
-                rel_aro = rel.split(' ')[-1]
-                yield graph.node[rel_aro]['name']
+                yield rel.split(' ')[-1]
     if 'is_a' in node:
         for new_aro in node['is_a']:
             yield from get_relationship(new_aro, relation)
@@ -27,9 +26,12 @@ def get_mechanism(aro):
     if 'is_a' in node:
         for new_aro in node['is_a']:
             if new_aro == 'ARO:1000002':  # mechanism of antibiotic resistance
-                yield node['name']
+                yield aro
             else:
                 yield from get_mechanism(new_aro)
+    if 'relationship' in node:
+        for rel in get_relationship(aro, 'participates_in'):
+            yield from get_mechanism(rel)
 
 
 with screed.open('card/data/nucleotide_fasta_protein_homolog_model.fasta') as seqfile:
@@ -40,9 +42,9 @@ with screed.open('card/data/nucleotide_fasta_protein_homolog_model.fasta') as se
             'target':     seq.name,
             'aro':        aro,
             'gc_content': len(re.findall('[GC]', seq.sequence)) / len(seq.sequence),
-            'drug_class': '|'.join(set([d for d in get_relationship(aro, 'confers_resistance_to_drug_class')])),
-            'mechanism':  '|'.join(set([m for m in get_mechanism(aro)])),
+            'drug_class': '|'.join(set([graph.node[d]['name'] for d in get_relationship(aro, 'confers_resistance_to_drug_class')])),
+            'mechanism':  '|'.join(set([graph.node[m]['name'] for m in get_mechanism(aro)])),
         })
 
 df = pd.DataFrame(output)
-df.to_csv('gene_info.tsv', sep='\t')
+df.to_csv('gene_info.tsv', sep='\t', index=None)
