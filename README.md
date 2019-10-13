@@ -13,5 +13,8 @@ Do this within the base directory of the repository.
 > $ bash build.sh
 
 ## Usage
-Build the gene metadata file
+1. Load the virtual environment
+> $ pipenv shell
+
+2. Build the gene metadata file
 > $ python build_db.py
