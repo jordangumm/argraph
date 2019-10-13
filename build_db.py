@@ -39,11 +39,12 @@ with screed.open('card/data/nucleotide_fasta_protein_homolog_model.fasta') as se
     for seq in seqfile:
         aro = seq.name.split('|')[4]
         output.append({
-            'target':     seq.name,
-            'aro':        aro,
-            'gc_content': len(re.findall('[GC]', seq.sequence)) / len(seq.sequence),
-            'drug_class': '|'.join(set([graph.node[d]['name'] for d in get_relationship(aro, 'confers_resistance_to_drug_class')])),
-            'mechanism':  '|'.join(set([graph.node[m]['name'] for m in get_mechanism(aro)])),
+            'target':      seq.name,
+            'aro':         aro,
+            'gc_content':  len(re.findall('[GC]', seq.sequence)) / len(seq.sequence),
+            'gene_length': len(seq.sequence),
+            'drug_class':  '|'.join(set([graph.node[d]['name'] for d in get_relationship(aro, 'confers_resistance_to_drug_class')])),
+            'mechanism':   '|'.join(set([graph.node[m]['name'] for m in get_mechanism(aro)])),
         })
 
 df = pd.DataFrame(output)
